@@ -1,7 +1,52 @@
+
+import 'package:firebase_core/firebase_core.dart';
+import 'auth_gate.dart';
+import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 
-void main() {
+// void main()
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
+}
+
+Future<void> registerUser({
+  required String email,
+  required String password,
+  required String displayName,
+}) async {
+  final cred = await FirebaseAuth.instance
+      .createUserWithEmailAndPassword(email: email, password: password);
+
+  final uid = cred.user!.uid;
+
+  await FirebaseFirestore.instance.collection('users').doc(uid).set({
+    'email': email,
+    'displayName': displayName,
+    'photoUrl': null,
+    'role': 'student',
+    'createdAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
+  });
+}
+
+Future<DocumentSnapshot<Map<String, dynamic>>> getMyProfile() {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  return FirebaseFirestore.instance.collection('users').doc(uid).get();
+}
+
+Future<void> updateMyProfile({required String displayName}) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  await FirebaseFirestore.instance.collection('users').doc(uid).update({
+    'displayName': displayName,
+    'updatedAt': FieldValue.serverTimestamp(),
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -30,7 +75,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const AuthGate(),
     );
   }
 }
