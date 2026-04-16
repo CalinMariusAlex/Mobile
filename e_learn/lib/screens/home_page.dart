@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 
 import 'my_account_page.dart';
 import 'edit_profile_page.dart';
+import 'skills_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -40,6 +41,17 @@ class HomePage extends StatelessWidget {
                 );
               },
               ),
+            ListTile(
+              leading: const Icon(Icons.school),
+              title: const Text('Skills'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SkillsPage()),
+                );
+              },
+            ),
               ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Edit profile'),
@@ -51,6 +63,7 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
+            
           ],
         ),
       ),
